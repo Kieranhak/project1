@@ -1,101 +1,65 @@
-# Byte-compiled / optimized / DLL files
-__pycache__/
-*.py[cod]
-*$py.class
+import RPi.GPIO as GPIO
+from time import sleep
 
-# C extensions
-*.so
+GPIO.setmode(GPIO.BCM)
 
-# Distribution / packaging
-.Python
-env/
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
+GPIO.setup(24, GPIO.OUT)    # motors setup
+GPIO.setup(17, GPIO.OUT)    
+GPIO.setup(27, GPIO.OUT)   
+GPIO.setup(23, GPIO.OUT)    
 
-# PyInstaller
-#  Usually these files are written by a python script from a template
-#  before PyInstaller builds the exe, so as to inject date/other infos into it.
-*.manifest
-*.spec
+GPIO.setup(25, GPIO.IN)     #sensor setup
 
-# Installer logs
-pip-log.txt
-pip-delete-this-directory.txt
+def  sensorcheck:()
 
-# Unit test / coverage reports
-htmlcov/
-.tox/
-.coverage
-.coverage.*
-.cache
-nosetests.xml
-coverage.xml
-*.cover
-.hypothesis/
+    i=0                           
 
-# Translations
-*.mo
-*.pot
+    while i<5:   
+        sensor=GPIO.input(25)       #reads from the sensor
 
-# Django stuff:
-*.log
-local_settings.py
+        if sensor==1:               
+            print("there is nothing")
+            sleep(0.1)             
 
-# Flask stuff:
-instance/
-.webassets-cache
+        elif sensor==0:            
+            print("there is something motors stop")
+            GPIO.output(17, GPIO.LOW)   #stops wheels
+            GPIO.output(27, GPIO.LOW)
+            GPIO.output(23, GPIO.LOW)
+            GPIO.output(24, GPIO.LOW)
+        elif i=5:                   
+            break                 
+                
+        i=i+1                
+while True:
 
-# Scrapy stuff:
-.scrapy
+        key=input("Type in your command")
+              
+        if key == "w":
+                GPIO.output(17, GPIO.HIGH)      # forward
+                GPIO.output(24, GPIO.HIGH)
+                sensorcheck()                   
+                GPIO.output(17, GPIO.LOW)
+                GPIO.output(24, GPIO.LOW)
+                
+        elif key == "a":
+                GPIO.output(17, GPIO.HIGH)      # left
+                sensorcheck()                    
+                GPIO.output(17, GPIO.LOW) 
+                                                 
+        elif key == "d":
+                GPIO.output(24, GPIO.HIGH)      # right
+                sensorcheck()                    
+                GPIO.output(24, GPIO.LOW) 
+                        
+        elif key == "s":
+                GPIO.output(27, GPIO.HIGH)      #reverse
+                GPIO.output(23, GPIO.HIGH)
+                sensorcheck()                    
+                GPIO.output(27, GPIO.LOW)
+                GPIO.output(23, GPIO.LOW)
 
-# Sphinx documentation
-docs/_build/
-
-# PyBuilder
-target/
-
-# Jupyter Notebook
-.ipynb_checkpoints
-
-# pyenv
-.python-version
-
-# celery beat schedule file
-celerybeat-schedule
-
-# SageMath parsed files
-*.sage.py
-
-# dotenv
-.env
-
-# virtualenv
-.venv
-venv/
-ENV/
-
-# Spyder project settings
-.spyderproject
-.spyproject
-
-# Rope project settings
-.ropeproject
-
-# mkdocs documentation
-/site
-
-# mypy
-.mypy_cache/
+        elif key == "z":                        #stops the code
+                GPIO.cleanup()
+                print("Powering down motors")
+                print("Have a nice day!")
